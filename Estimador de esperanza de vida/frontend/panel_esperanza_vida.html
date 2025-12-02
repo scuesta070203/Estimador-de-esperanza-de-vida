@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Estimador de Esperanza de Vida</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="tema_esperanza.css">
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1>Estimador de Esperanza de Vida</h1>
+      <p>
+        Herramienta académica que utiliza datos históricos de la OMS (2000–2015)
+        para estimar la esperanza de vida de una población, usando tres modelos:
+        regresión lineal, KNN y MLP. Está pensada como apoyo didáctico, no como
+        sistema de soporte clínico.
+      </p>
+    </header>
+
+    <main class="layout">
+      <section class="panel panel-form">
+        <h2>Datos de entrada</h2>
+        <form id="predictForm">
+          <div class="grid">
+
+            <!-- País -->
+            <div class="field">
+              <label for="countrySelect">País</label>
+              <select id="countrySelect" data-col="Country"></select>
+            </div>
+
+            <!-- Año -->
+            <div class="field">
+              <label for="yearInput">Año de referencia</label>
+              <input id="yearInput" data-col="Year" type="number" />
+              <small class="hint" data-hint="Year"></small>
+            </div>
+
+            <!-- Mortalidad adulta (sin rango) -->
+            <div class="field">
+              <label for="adultMortality">Mortalidad adulta</label>
+              <input id="adultMortality" data-col="Adult Mortality" type="number" step="0.01" />
+            </div>
+
+            <!-- Muertes infantiles (sin rango) -->
+            <div class="field">
+              <label for="infantDeaths">Muertes infantiles</label>
+              <input id="infantDeaths" data-col="infant deaths" type="number" step="1" />
+            </div>
+
+            <!-- Alcohol (con rango) -->
+            <div class="field">
+              <label for="alcohol">Consumo de alcohol (litros per cápita)</label>
+              <input id="alcohol" data-col="Alcohol" type="number" step="0.01" />
+              <small class="hint" data-hint="Alcohol"></small>
+            </div>
+
+            <!-- Gasto sanitario % (sin rango) -->
+            <div class="field">
+              <label for="pctExp">Gasto sanitario (%)</label>
+              <input id="pctExp" data-col="percentage expenditure" type="number" step="0.01" />
+            </div>
+
+            <!-- Hepatitis B (con rango) -->
+            <div class="field">
+              <label for="hepB">Cobertura Hepatitis B (%)</label>
+              <input id="hepB" data-col="Hepatitis B" type="number" step="0.01" />
+              <small class="hint" data-hint="Hepatitis B"></small>
+            </div>
+
+            <!-- Sarampión (sin rango) -->
+            <div class="field">
+              <label for="measles">Casos de sarampión</label>
+              <input id="measles" data-col="Measles " type="number" step="1" />
+            </div>
+
+            <!-- BMI (con rango) -->
+            <div class="field">
+              <label for="bmi">Índice de masa corporal (IMC)</label>
+              <input id="bmi" data-col=" BMI " type="number" step="0.01" />
+              <small class="hint" data-hint=" BMI "></small>
+            </div>
+
+            <!-- Menores de 5 (sin rango) -->
+            <div class="field">
+              <label for="u5Deaths">Muertes menores de 5 años</label>
+              <input id="u5Deaths" data-col="under-five deaths " type="number" step="1" />
+            </div>
+
+            <!-- Polio (con rango) -->
+            <div class="field">
+              <label for="polio">Cobertura Polio (%)</label>
+              <input id="polio" data-col="Polio" type="number" step="0.01" />
+              <small class="hint" data-hint="Polio"></small>
+            </div>
+
+            <!-- Gasto total salud (con rango) -->
+            <div class="field">
+              <label for="totExp">Gasto total en salud (% PIB)</label>
+              <input id="totExp" data-col="Total expenditure" type="number" step="0.01" />
+              <small class="hint" data-hint="Total expenditure"></small>
+            </div>
+
+            <!-- Difteria (con rango) -->
+            <div class="field">
+              <label for="diphtheria">Cobertura Difteria (%)</label>
+              <input id="diphtheria" data-col="Diphtheria " type="number" step="0.01" />
+              <small class="hint" data-hint="Diphtheria "></small>
+            </div>
+
+            <!-- HIV (con rango) -->
+            <div class="field">
+              <label for="hiv">Tasa HIV/SIDA</label>
+              <input id="hiv" data-col=" HIV/AIDS" type="number" step="0.01" />
+              <small class="hint" data-hint=" HIV/AIDS"></small>
+            </div>
+
+            <!-- PIB per cápita (sin rango) -->
+            <div class="field">
+              <label for="gdp">PIB per cápita</label>
+              <input id="gdp" data-col="GDP" type="number" step="0.01" />
+            </div>
+
+            <!-- Población total (sin rango) -->
+            <div class="field">
+              <label for="population">Población total</label>
+              <input id="population" data-col="Population" type="number" step="1" />
+            </div>
+
+            <!-- Delgadez 1–19 (con rango) -->
+            <div class="field">
+              <label for="thin19">Delgadez 1–19 años</label>
+              <input id="thin19" data-col=" Thinness  1-19 years" type="number" step="0.01" />
+              <small class="hint" data-hint=" Thinness  1-19 years"></small>
+            </div>
+
+            <!-- Delgadez 5–9 (con rango) -->
+            <div class="field">
+              <label for="thin5">Delgadez 5–9 años</label>
+              <input id="thin5" data-col=" thinness 5-9 years" type="number" step="0.01" />
+              <small class="hint" data-hint=" thinness 5-9 years"></small>
+            </div>
+
+            <!-- Índice ingreso (SIN rango) -->
+            <div class="field">
+              <label for="incomeComp">Índice de ingreso</label>
+              <input id="incomeComp" data-col="Income composition of resources" type="number" step="0.01" />
+            </div>
+
+            <!-- Escolaridad (con rango) -->
+            <div class="field">
+              <label for="schooling">Escolaridad promedio (años)</label>
+              <input id="schooling" data-col="Schooling" type="number" step="0.01" />
+              <small class="hint" data-hint="Schooling"></small>
+            </div>
+
+          </div>
+
+          <div class="buttons">
+            <button type="submit" class="btn-primary">Calcular esperanza de vida</button>
+            <button type="button" id="resetBtn" class="btn-secondary">Limpiar formulario</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel panel-results">
+        <h2>Resultados de los modelos</h2>
+        <p class="results-note">
+          Todos los resultados son estimaciones basadas en datos históricos y se usan únicamente con fines académicos.
+        </p>
+        <div class="results-grid">
+          <article class="result-card">
+            <h3>Regresión lineal</h3>
+            <p id="regResult" class="result-value">Sin cálculo aún.</p>
+          </article>
+
+          <article class="result-card">
+            <h3>KNN (clasificación)</h3>
+            <p id="knnResult" class="result-value">Sin cálculo aún.</p>
+          </article>
+
+          <article class="result-card">
+            <h3>MLP (clasificación)</h3>
+            <p id="mlpResult" class="result-value">Sin cálculo aún.</p>
+          </article>
+        </div>
+
+        <p id="globalMessage" class="global-message"></p>
+      </section>
+    </main>
+  </div>
+
+  <script src="control_esperanza.js"></script>
+</body>
+</html>
